@@ -43,9 +43,7 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
   url.searchParams.set("departureDateTime", derpatureDateTime)
   url.searchParams.set("returnDateTime", returnDateTime)
 
-  const cookieJar = new makeFetchCookie.toughCookie.CookieJar()
-
-  const fetchCookie = makeFetchCookie(fetch, cookieJar)
+  const fetchCookie = makeFetchCookie(fetch)
 
   await fetchCookie("https://interline.tudoazul.com", {
     headers: {
@@ -59,7 +57,7 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
         "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36"
     }
   })
-  const data = await response.json()
+  let data = await response.json()
 
   let flights = data?.departureFlights?.flights as {
     id: string
