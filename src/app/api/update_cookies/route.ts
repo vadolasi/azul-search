@@ -2,7 +2,6 @@ import { firefox } from "playwright"
 import { writeFile } from "fs/promises"
 
 export async function POST() {
-
   const browser = await firefox.launch({ headless: true })
 
   const page = await browser.newPage()

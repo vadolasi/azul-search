@@ -217,15 +217,15 @@ export default function Home() {
         <div className="flex gap-4 w-full">
           <div className="flex flex-col w-full">
             <label htmlFor="input_adultos">Adultos</label>
-            <input id="input_adultos" type="number" className="p-2 border bg-white rounded" {...register("adultos")} min={1} max={9} step={1} />
+            <input id="input_adultos" type="number" className="p-2 border bg-white rounded" {...register("adultos", { valueAsNumber: true })} min={1} max={9} step={1} />
           </div>
           <div className="flex flex-col w-full">
             <label htmlFor="input_criancas">Crianças</label>
-            <input id="input_criancas" type="number" className="p-2 border bg-white rounded" {...register("criancas")} min={0} max={9} step={1} />
+            <input id="input_criancas" type="number" className="p-2 border bg-white rounded" {...register("criancas", { valueAsNumber: true })} min={0} max={9} step={1} />
           </div>
           <div className="flex flex-col w-full">
             <label htmlFor="input_bebes">Bebês</label>
-            <input id="input_bebes" type="number" className="p-2 border bg-white rounded" {...register("bebes")} min={0} max={9} step={1} />
+            <input id="input_bebes" type="number" className="p-2 border bg-white rounded" {...register("bebes", { valueAsNumber: true })} min={0} max={9} step={1} />
           </div>
         </div>
         <div className="flex gap-4 w-full">
