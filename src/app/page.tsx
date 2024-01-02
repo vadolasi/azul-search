@@ -72,6 +72,8 @@ export default function Home() {
     }
   })
 
+  console.log(errors)
+
   const router = useRouter()
 
   const onSubmit = handleSubmit(data => {
