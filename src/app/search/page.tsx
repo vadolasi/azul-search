@@ -16,6 +16,12 @@ interface SearchProps {
   returnDateTime: string
 }
 
+AbortSignal.timeout ??= function timeout(ms) {
+  const ctrl = new AbortController()
+  setTimeout(() => ctrl.abort(), ms)
+  return ctrl.signal
+}
+
 const Page: NextPage<{ searchParams: SearchProps }> = async ({
   searchParams: {
     from,
@@ -69,7 +75,8 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
           "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36",
         "cookie": cookies
       },
-      "referrerPolicy": "strict-origin-when-cross-origin"
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      signal: AbortSignal.timeout(300000)
     })
 
     let data = await response.json()
