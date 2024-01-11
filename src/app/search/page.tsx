@@ -79,7 +79,8 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
       signal: AbortSignal.timeout(300000)
     })
 
-    let data = await response.json()
+    let data1 = await response.text()
+    let data = JSON.parse(data1)
 
     let flights = data?.departureFlights?.flights as unknown as {
       id: string
@@ -106,7 +107,7 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
       {calendar.map(({ day, flights }) => (
         <div key={day.toString()} className="flex flex-col gap-6">
           <span className="text-center font-bold mt-6">{day.toLocaleDateString("pt-BR")}</span>
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4">
             {flights.map((flight: any) => (
               <div key={flight.id}>
                 <div className="flex items-center justify-center gap-4">
