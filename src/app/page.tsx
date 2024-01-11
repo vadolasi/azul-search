@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import useSWR from "swr"
+import clsx from "clsx"
 
 const schema = z.object({
   origem: z.object({
@@ -21,7 +22,7 @@ const schema = z.object({
     const hoje = new Date()
     hoje.setHours(0, 0, 0, 0)
     return data >= hoje
-  }, "A data de saída deve ser maior ou igual a data atual"),
+  }, "A data de saída deve ser maior ou igual a data atual").optional(),
   dataRetorno: z.date().refine(value => {
     const data = new Date(value)
     const hoje = new Date()
@@ -32,11 +33,10 @@ const schema = z.object({
   criancas: z.number().int().min(0).max(9),
   bebes: z.number().int().min(0).max(9),
   onlyDirect: z.boolean().optional(),
-  onlyOneWay: z.boolean().optional(),
   cabinCategory: z.enum(["ECONOMY", "BUSINESS"]).default("ECONOMY")
 })
   .refine(value => {
-    if (!value.dataRetorno) {
+    if (!value.dataSaida || !value.dataRetorno) {
       return true
     }
 
@@ -67,8 +67,7 @@ export default function Home() {
       },
       adultos: 1,
       criancas: 0,
-      bebes: 0,
-      dataSaida: new Date()
+      bebes: 0
     }
   })
 
@@ -76,7 +75,7 @@ export default function Home() {
 
   const onSubmit = handleSubmit(data => {
     const searchParams = new URLSearchParams()
-    searchParams.set("tripType", data.onlyOneWay ? "ONE_WAY" : "ROUND_TRIP")
+    searchParams.set("tripType", "ONE_WAY")
     searchParams.set("from", data.origem.code)
     searchParams.set("to", data.destino.code)
     searchParams.set("adult", data.adultos.toString())
@@ -85,7 +84,7 @@ export default function Home() {
     searchParams.set("cabin", data.cabinCategory)
     searchParams.set("flightType", data.onlyDirect ? "DIRECT" : "ALL")
     searchParams.set("companies", "-")
-    searchParams.set("derpatureDateTime", data.dataSaida.toISOString())
+    searchParams.set("derpatureDateTime", data.dataSaida!.toISOString())
     if (data.dataRetorno) {
       searchParams.set("returnDateTime", data.dataRetorno.toISOString())
     }
@@ -97,7 +96,6 @@ export default function Home() {
   const origemCode = watch("origem.code")
   const destino = watch("destino.name")
   const dataSaida = watch("dataSaida")
-  const onlyOneWay = watch("onlyOneWay")
 
   const { data: origens } = useSWR<{ code: string, name: string }[]>(
     () => {
@@ -134,10 +132,6 @@ export default function Home() {
   return (
     <div className="flex gap-4 items-center justify-center w-full min-h-screen">
       <form className="flex flex-col gap-8 w-1/2" onSubmit={onSubmit}>
-        <label htmlFor="input_onlyOneWay">
-          <input id="input_onlyOneWay" type="checkbox" className="mr-2" {...register("onlyOneWay")} />
-          Somente ida
-        </label>
         <div className="flex gap-4">
           <div className="relative w-full">
             <label htmlFor="input_origem">Origem</label>
@@ -188,30 +182,28 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div className="flex gap-4 w-full">
-          <div className="flex flex-col w-full">
-            <label htmlFor="input_data_saida">Data de saída</label>
-            <input
-              id="input_data_saida"
-              type="date"
-              className="p-2 border bg-white rounded"
-              {...register("dataSaida", { valueAsDate: true })} min={new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            {!onlyOneWay && (
-              <>
-                <label htmlFor="input_data_retorno">Data de retorno</label>
-                <input
-                  id="input_data_retorno"
-                  type="date"
-                  className="p-2 border bg-white rounded disabled:opacity-50"
-                  {...register("dataRetorno", { valueAsDate: true })}
-                  disabled={!dataSaida}
-                  min={dataSaida ? dataSaida.toISOString().split("T")[0] : ""}
-                />
-              </>
-            )}
+        <div>
+          <label>Informe um intervalo de datas</label>
+          <div className="flex gap-4 w-full">
+            <div className="flex flex-col w-full">
+              <input
+                id="input_data_saida"
+                type="date"
+                className="p-2 border bg-white rounded disabled:opacity-50"
+                {...register("dataSaida", { valueAsDate: true })}
+                min={new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+              />
+            </div>
+            <div className="flex flex-col w-full">
+              <input
+                id="input_data_retorno"
+                type="date"
+                className="p-2 border bg-white rounded disabled:opacity-50"
+                {...register("dataRetorno", { valueAsDate: true })}
+                disabled={!dataSaida}
+                min={dataSaida !== undefined && dataSaida !== null && String(new Date(dataSaida)) !== "Invalid Date" ? dataSaida.toISOString().split("T")[0] : new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+              />
+            </div>
           </div>
         </div>
         <div className="flex gap-4 w-full">

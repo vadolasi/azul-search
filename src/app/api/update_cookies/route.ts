@@ -8,9 +8,10 @@ export async function POST() {
 
   await page.goto("https://interline.tudoazul.com/")
 
-  let cookies = await page.context().cookies()
-  cookies = cookies.filter(cookie => cookie.domain.endsWith(".tudoazul.com"))
-  const cookieString = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join(";")
+  const cookies = await page.context().cookies()
+  const cookieString = cookies
+    .filter(cookie => cookie.domain.endsWith(".tudoazul.com"))
+    .map(cookie => `${cookie.name}=${cookie.value}`).join(";")
 
   await browser.close()
 
