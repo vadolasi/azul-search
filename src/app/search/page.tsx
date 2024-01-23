@@ -1,5 +1,4 @@
 import { NextPage } from "next"
-import { readFile } from "fs/promises"
 import FlightPoints from "./_components/FlightPoints"
 
 interface SearchProps {
@@ -44,54 +43,53 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
   days.shift()
   days.push(new Date(departureDate))
 
-  const cookies = await readFile("./cookies.txt", "utf-8")
-
   const calendar: any[] = []
 
   await Promise.all(days.map(async day => {
-    const url = new URL("https://interline.tudoazul.com/catalog/api/v1/availability")
-    url.searchParams.set("tripType", tripType)
-    url.searchParams.set("origin", from)
-    url.searchParams.set("destination", to)
-    url.searchParams.set("adult", adult)
-    url.searchParams.set("child", child)
-    url.searchParams.set("infant", infant)
-    url.searchParams.set("cabinCategory", cabin)
-    url.searchParams.set("typeOfFlight", flightType)
-    url.searchParams.set("companiesIdentity", companies)
-    url.searchParams.set("departureDateTime", day.toISOString())
+    try {
+      const url = new URL("http://interline.tudoazul.com/catalog/api/v1/availability")
+      url.searchParams.set("tripType", tripType)
+      url.searchParams.set("origin", from)
+      url.searchParams.set("destination", to)
+      url.searchParams.set("adult", adult)
+      url.searchParams.set("child", child)
+      url.searchParams.set("infant", infant)
+      url.searchParams.set("cabinCategory", cabin)
+      url.searchParams.set("typeOfFlight", flightType)
+      url.searchParams.set("companiesIdentity", companies)
+      url.searchParams.set("departureDateTime", day.toISOString())
 
-    const cookies = await readFile("./cookies.txt", "utf-8")
+      const finalUrl = new URL("http://localhost:8000")
+      finalUrl.searchParams.set("url", url.toString())
 
-    const response = await fetch(url.toString(), {
-      "headers": {
-        "user-agent":
-          "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36",
-        "cookie": cookies
-      },
-      "referrerPolicy": "strict-origin-when-cross-origin"
-    })
+      const response = await fetch(finalUrl.toString())
 
-    const data = await response.json()
+      const data = await response.json() as any
 
-    const flights = data?.departureFlights?.flights as unknown as {
-      id: string
-      originAirport: string
-      originAirportName: string
-      finalDestination: string
-      finalDestinationName: string
-      operatingCarriers: string[]
-      prices: {
-        value: number
-        currency: string
-        classType: string
+      const flights = data?.departureFlights?.flights as unknown as {
+        id: string
+        originAirport: string
+        originAirportName: string
+        finalDestination: string
+        finalDestinationName: string
+        operatingCarriers: string[]
+        prices: {
+          value: number
+          currency: string
+          classType: string
+        }[]
       }[]
-    }[]
 
-    calendar.push({
-      day,
-      flights
-    })
+      flights.sort((a, b) => a.prices[0].value - b.prices[0].value)
+      flights.splice(5)
+
+      calendar.push({
+        day,
+        flights
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }))
 
   return (
@@ -107,7 +105,7 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
                   <span>→</span>
                   <span>{flight.finalDestinationName}</span>
                 </div>
-                <FlightPoints flight={flight} cabin={cabin} derpatureDateTime={derpatureDateTime} cookie={cookies} />
+                <FlightPoints flight={flight} cabin={cabin} derpatureDateTime={derpatureDateTime} />
               </div>
             ))}
           </div>

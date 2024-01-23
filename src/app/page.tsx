@@ -202,6 +202,7 @@ export default function Home() {
                 {...register("dataRetorno", { valueAsDate: true })}
                 disabled={!dataSaida}
                 min={dataSaida !== undefined && dataSaida !== null && String(new Date(dataSaida)) !== "Invalid Date" ? dataSaida.toISOString().split("T")[0] : new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+                max={dataSaida !== undefined && dataSaida !== null && String(new Date(dataSaida)) !== "Invalid Date" ? new Date(new Date(dataSaida).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] : new Date(Date.now() + 34 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
               />
             </div>
           </div>

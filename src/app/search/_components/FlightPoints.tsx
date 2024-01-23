@@ -18,10 +18,9 @@ interface Props {
   }
   cabin: string
   derpatureDateTime: string
-  cookie: string
 }
 
-const FlightPoints: React.FC<Props> = ({ flight, cabin, derpatureDateTime, cookie }) => {
+const FlightPoints: React.FC<Props> = ({ flight, cabin, derpatureDateTime }) => {
   const [points, setPoints] = useState<number | null>(null)
 
   useEffect(() => {
@@ -31,8 +30,7 @@ const FlightPoints: React.FC<Props> = ({ flight, cabin, derpatureDateTime, cooki
         headers: {
           "user-agent":
             "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36",
-          "content-type": "application/json;charset=UTF-8",
-          cookie
+          "content-type": "application/json;charset=UTF-8"
         },
         body: JSON.stringify({
           items: {
