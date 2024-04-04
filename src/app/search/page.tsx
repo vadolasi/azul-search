@@ -15,6 +15,10 @@ interface SearchProps {
   returnDateTime: string
 }
 
+function daysInMonth(month: number, year: number) {
+  return new Date(year, month, 0).getDate()
+}
+
 const Page: NextPage<{ searchParams: SearchProps }> = async ({
   searchParams: {
     from,
@@ -81,11 +85,11 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
       }[]
 
       flights.sort((a, b) => a.prices[0].value - b.prices[0].value)
-      flights.splice(5)
+      const flight = flights[0]
 
       calendar.push({
         day,
-        flights
+        flight
       })
     } catch (error) {
       console.error(error)
@@ -93,24 +97,33 @@ const Page: NextPage<{ searchParams: SearchProps }> = async ({
   }))
 
   return (
-    <div className="w-full min-h-screen flex flex-col gap-4 items-center justify-center">
-      {calendar.map(({ day, flights }) => (
-        <div key={day.toString()} className="flex flex-col gap-6">
-          <span className="text-center font-bold mt-6">{day.toLocaleDateString("pt-BR")}</span>
-          <div className="flex flex-col gap-4">
-            {flights.map((flight: any) => (
+    <div className="w-screen min-h-screen flex flex-col gap-2 items-center justify-center p-10 md:p-0">
+      <div className="grid grid-cols-7 w-full gap-2 md:w-2/3 lg:w-1/4">
+        {new Array(calendar[0].day.getDay() + 1
+        ).fill(null).map((_, index) => (
+          <div key={index} className="text-center font-bold mt-6 text-sm text-gray-400"></div>
+        ))}
+        {new Array(calendar[0].day.getDate() - 1).fill(null).map((_, index) => (
+          <div key={index} className="text-center font-bold mt-6 text-sm text-gray-400">
+            {index + 1}
+          </div>
+        ))}
+        {calendar.map(({ day, flight }) => (
+          <div key={day.toString()} className="flex items-center justify-center flex-col">
+            <span className="text-center font-bold mt-6 text-sm">{day.getDate()}</span>
+            <div className="flex flex-col gap-2">
               <div key={flight.id}>
-                <div className="flex items-center justify-center gap-4">
-                  <span>{flight.originAirportName}</span>
-                  <span>→</span>
-                  <span>{flight.finalDestinationName}</span>
-                </div>
                 <FlightPoints flight={flight} cabin={cabin} derpatureDateTime={derpatureDateTime} />
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+        {(daysInMonth(returnDate.getMonth() + 1, returnDate.getFullYear()) - returnDate.getDate() > 0) && new Array(daysInMonth(returnDate.getMonth() + 1, returnDate.getFullYear()) - returnDate.getDate()).fill(null).map((_, index) => (
+          <div key={index} className="text-center font-bold mt-6 text-sm text-gray-400">
+            {index + calendar[calendar.length - 1].day.getDate() + 1}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

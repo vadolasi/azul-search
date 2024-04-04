@@ -1,3 +1,6 @@
+/* eslint-disable react/display-name */
+/* eslint-disable import/no-anonymous-default-export */
+
 export default () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen">

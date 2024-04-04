@@ -55,13 +55,12 @@ const FlightPoints: React.FC<Props> = ({ flight, cabin, derpatureDateTime }) => 
   }, [])
 
   return (
-    <div className="flex items-center justify-center gap-4">
+    <div className="flex gap-4 text-xs">
       {points === null ? (
         <div className="w-4 h-4 bg-gray-400 rounded-full animate-bounce"></div>
       ) : (
         <>
-          <span>{points}</span>
-          <span>pontos</span>
+          <span className="text-center">{points / 1000} mil</span>
         </>
       )}
     </div>
